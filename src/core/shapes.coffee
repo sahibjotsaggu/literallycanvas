@@ -319,7 +319,6 @@ linePathFuncs =
     if !@smooth
       @smoothedPoints = @points
       return
-
     if not @smoothedPoints or @points.length < @sampleSize
       @smoothedPoints = bspline(@points, @order)
     else

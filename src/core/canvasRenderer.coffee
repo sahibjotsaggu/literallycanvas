@@ -1,6 +1,6 @@
 lineEndCapShapes = require './lineEndCapShapes'
 renderers = {}
-
+isPoint = false
 
 # drawFunc(ctx, shape, retryCallback)
 # drawLatest(ctx, bufferCtx, shape, retryCallback)
@@ -152,27 +152,31 @@ _drawRawLinePath = (ctx, points, close=false, lineCap='round') ->
 
   ctx.strokeStyle = points[0].color
   ctx.lineWidth = points[0].size
-
   ctx.beginPath()
 
   if points[0].size % 2 == 0
     ctx.moveTo(points[0].x, points[0].y)
   else
     ctx.moveTo(points[0].x+0.5, points[0].y+0.5)
-
   for point in points.slice(1)
-    if points[0].size % 2 == 0
-      ctx.lineTo(point.x, point.y)
+    if point.x == points[0].x and point.y == points[0].y
+      isPoint = true
+      ctx.arc(point.x, point.y, points[0].size / 2, 0, 2 * Math.PI, false);
+      ctx.fill()
     else
-      ctx.lineTo(point.x+0.5, point.y+0.5)
+      isPoint = false
+      if points[0].size % 2 == 0
+        ctx.lineTo(point.x, point.y)
+      else
+        ctx.lineTo(point.x+0.5, point.y+0.5)
 
   if close
     ctx.closePath()
 
-
 drawLinePath = (ctx, shape) ->
   _drawRawLinePath(ctx, shape.smoothedPoints)
-  ctx.stroke()
+  if !isPoint
+    ctx.stroke()
 drawLinePathLatest = (ctx, bufferCtx, shape) ->
   if shape.tail
     segmentStart =
